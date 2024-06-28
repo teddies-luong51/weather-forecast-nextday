@@ -11,16 +11,19 @@ kind = st.selectbox("Select data to view",
 st.subheader(f"{kind} for the next {days} days in {place}")
 
 if place:
-    filter_data = get_data(place, days)
+    try:
+        filter_data = get_data(place, days)
 
-    if kind == "Temperature":
-        temperatures = [dict["main"]["temp"] for dict in filter_data]
-        date_points = [dict["dt_txt"] for dict in filter_data]
-        figure = px.line(x=date_points, y=temperatures, labels={"x":"Dates", "y":"Temperature (C)"})
-        st.plotly_chart(figure)
+        if kind == "Temperature":
+            temperatures = [dict["main"]["temp"]/10 for dict in filter_data]
+            date_points = [dict["dt_txt"] for dict in filter_data]
+            figure = px.line(x=date_points, y=temperatures, labels={"x":"Dates", "y":"Temperature (C)"})
+            st.plotly_chart(figure)
 
-    if kind == "Sky":
-        rule = {"Clouds":"images/cloud.png", "Rain":"images/rain.png", "Snow":"image/snow.png", "Clear":"images/clear.png"}
-        conditions = [dict["weather"][0]['main'] for dict in filter_data]
-        image_condition = [rule[condition] for condition in conditions]
-        st.image(image_condition, width=100)
+        if kind == "Sky":
+            rule = {"Clouds":"images/cloud.png", "Rain":"images/rain.png", "Snow":"image/snow.png", "Clear":"images/clear.png"}
+            conditions = [dict["weather"][0]['main'] for dict in filter_data]
+            image_condition = [rule[condition] for condition in conditions]
+            st.image(image_condition, width=100)
+    except KeyError:
+        st.write("You should enter the right city name")
